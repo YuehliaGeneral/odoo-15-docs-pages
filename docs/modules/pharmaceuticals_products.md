@@ -77,3 +77,35 @@ The Pharmaceuticals Products module provides:
 - **Percentage Calculations**: Vendor-specific percentage application
 - **Journal Entry Creation**: Automatic generation based on transaction type
 - **Multi-Product Support**: Handles multiple consignment products in single transaction
+
+## Audit Snapshot Fields
+To improve traceability, when a deals product line triggers an automatic journal, the following fields are captured on each generated `account.move.line` at posting time:
+
+- **pharm_quantity_snapshot**: Quantity from the originating invoice line at posting time
+- **pharm_available_qty_snapshot**: Product free quantity at posting time
+- **pharm_vendor_percent_snapshot**: Vendor percentage on product at posting time
+- **pharm_product_price_snapshot**: Product list price at posting time
+- **pharm_product_brand_snapshot**: Product brand value(s) at posting time
+- **pharm_product_default_code_snapshot**: Internal reference at posting time
+- **pharm_product_display_name_snapshot**: Product display name at posting time
+
+These are read-only snapshots stored on the journal lines for audit purposes.
+
+## Journal Reference Format
+Generated vendor deals journal entries include a reference that indicates the source and action:
+
+- **Invoice**: `INV-XXXX - Invoice - <Customer Name>`
+- **Invoice Cancel**: `<Original Number> - Invoice Cancel - <Customer Name>`
+- **Credit Note**: `RINV-XXXX - Credit Note - <Customer Name>`
+- **Credit Note Cancel**: `<Original Number> - Credit Note Cancel - <Customer Name>`
+
+The reference mirrors what is displayed in the "Journal Triggers" section and helps filtering and reconciliation.
+
+## Technical Settings
+The following system parameters determine the accounts and journal used for the generated entries:
+
+- `pharmaceuticals_products.deals_debit_account_id`
+- `pharmaceuticals_products.deals_credit_account_id`
+- `pharmaceuticals_products.deals_journal_id`
+
+Ensure these parameters are configured with valid IDs. The vendor on the product (`vendor_id`) is set as the partner on generated entries, and the brand list is stored as a comma-separated string when available.
