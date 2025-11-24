@@ -77,6 +77,7 @@ This will make the flow even more systematic, and we'll get proper KPIs for each
 
 ### Screenshot Example (But columns to be same as runsheet):
 <img width="844" height="399" alt="image" src="https://github.com/user-attachments/assets/f851d06b-a064-4392-b5ba-88f9a109d4ab" />
+![Driver Portal](../screenshots/Driver_portal.png)
 
 ## Code Distribution
 - **Primary Module**: `pick_pack_ship`
