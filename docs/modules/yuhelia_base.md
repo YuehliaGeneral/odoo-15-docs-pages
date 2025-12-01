@@ -25,15 +25,29 @@ The Yuehlia Base module serves as the core foundation module for Yuehlia brand c
 - **customer_note**: Customer-specific notes
 - **payment_gateway_id**: Related payment gateway from sale order
 
+Note: See the screenshot added in section 1.3 for how these delivery date/time fields display on pickings; the same columns are also added to the sale orders list view.
+
 #### 1.2 Package Management
 - **pkg_one**: Single package count field
 - **no_of_boxes**: Computed field for total package count
 - **runsheet_state**: Related runsheet state (draft, handover, confirmed, done, cancelled)
 
+![Picking Fields (PICK type)](../screenshots/yuehlia_base_picking_fields.png)
+
+Screenshot for the Picking operation of type "PICK" showing relevant fields.
+
+![Picking Fields (OUT type)](../screenshots/yuehlia_base_picking_OUT_fields.png)
+
+Screenshot for the Picking operation of type "OUT" showing relevant fields.
+
 #### 1.3 Scheduled Date Logic
 - **Automatic scheduling**: Delivery date and time affect the scheduled_date field
 - **Timezone handling**: Converts local time to UTC for proper scheduling
 - **Move line updates**: Updates stock move lines with new scheduled dates
+
+![Delivery Time & Date on Picking](../screenshots/yuehlia_base_delivery_time_date_picking.png)
+
+Note: The same delivery date/time columns are also added to the Sale Orders list view.
 
 ### 2. Product Management Enhancements
 
@@ -44,20 +58,50 @@ The Yuehlia Base module serves as the core foundation module for Yuehlia brand c
 - **product_brand_ids**: Many2one relationship with product brands
 - **product_categ_ids**: Related WooCommerce categories
 
+![Product Template – Product Name](../screenshots/yuehlia_base_product_template_product_name.png)
+
+![Product Brand on Product](../screenshots/yuehlia_base_product_product_brand.png)
+
+Note: Brand field is synced from WooCommerce. Only English products should sync this field. There is an issue where not all products in Odoo show a brand value even though WooCommerce has it for all; this should be fixed.
+
+![Sales Reporting – Group by Brand](../screenshots/yuehlia_base_sales_reporting_dashboard_brand.png)
+
+Note: Brand value is available to group sales reports by brand.
+
+![Purchase Form – Brand](../screenshots/yuehlia_base_purchase_form_brand.png)
+
+Note: Brand value is added to the Purchase form as well.
+
 #### 2.2 Product Search Enhancement
 - **Enhanced search**: Includes product name, default code, barcode, and vendor product name in search
 - **Multi-field search**: Searches across multiple product identification fields
+
+![Sales Reporting – Search by Brand](../screenshots/yuehlia_base_sales_reporting_dashboard_search_brand.png)
+
+Note: Brand value is searchable.
 
 ### 3. Purchase Order Enhancements
 
 #### 3.1 Purchase Order Line Extensions
 - **total_qty**: Computed field showing total quantity (qty + bonus qty)
 - **product_brand_ids**: Related product brand information
-- **Price automation**: Automatically sets price unit to product standard price
+- **Price automation**: Automatically sets price unit to product standard price: yuhelia_base/models/purchase.py:16-21, if the price is 0 then use the product_id.standard_price
+
+![Purchase Form – Brand](../screenshots/yuehlia_base_purchase_form_brand.png)
+
+Note: Brand value is added to the Purchase form.
+
+![Purchase Total Qty](../screenshots/yuehlia_base_purchase_total_qty.png)
+
+Note: The total qty field was created because we have a bonus qty (FOC) customization from the `purchase_bonus_qty` module.
 
 #### 3.2 Purchase Order Extensions
 - **po_type**: Selection field for PO Type (WSP, RSP)
 - **amount_discount**: Computed field for total discount amount
+
+![Purchase PO Type](../screenshots/yuehlia_base_purchase_po_type.png)
+
+Note: This is a simple drop-down to indicate which pricing type the PO is using; no further logic depends on it.
 
 ### 4. Sale Order Enhancements
 
@@ -65,32 +109,41 @@ The Yuehlia Base module serves as the core foundation module for Yuehlia brand c
 - **partial_credit_note()**: Method to open WooCommerce return order wizard
 - **WooCommerce integration**: Seamless integration with WooCommerce cancellation process
 
+![Sale Order – Partial Credit Note Shortcut](../screenshots/yuehlia_base_so_partial_credit_note.png)
+
+Note: Create credit note button shortcut – Not used; can be removed.
+
 #### 4.2 Customer Notes
 - **customer_note**: Field for customer-specific notes in sale orders
+
+![Sale Order – Customer Notes](../screenshots/yuehlia_base_so_customer_notes.png)
 
 ### 5. WooCommerce Integration
 
 #### 5.1 Stock Update Automation
-- **auto_update_all_prod_stock()**: Method to update all product stock to WooCommerce
+- **auto_update_all_prod_stock()**: Method to update all product stock to WooCommerce - Can be removed as its note used (function: auto_update_all_prod_stock, cron: ir_cron_update_woo_stock_all)
 - **Cron job**: Automated daily stock update (currently disabled)
 - **Instance-based updates**: Updates stock for specific WooCommerce instances
 
 ### 6. Runsheet Enhancements
 
 #### 6.1 Internal Driver Support
-- **emp_driver_id**: Many2one field for internal driver assignment
-- **Driver flexibility**: Supports both internal and external drivers
+- **emp_driver_id**: Many2one field for internal driver assignment - Its already defined in pick_pack_ship module, not sure if needed in yuehlia_base. (reference: yuhelia_base/models/runsheet.py)
 
 ### 7. Stock Move Line Enhancements
 
 #### 7.1 Automatic Lot Generation
-- **lot_name**: Auto-generated lot/serial numbers using sequence
+- **lot_name**: Auto-generated lot/serial numbers using sequence, not needed and can be removed (reference: yuhelia_base/models/stock.py:80-83)
 - **pro_image**: Related product image for visual identification
 
+![Picking Line – Product Image](../screenshots/yuehlia_base_picking_line_image.png)
+
 #### 7.2 Stock Move Extensions
-- **vendor_product_code**: Related vendor product reference number
-- **vendor_product_name**: Related vendor product name
+- **vendor_product_code**: Related vendor product reference number - can be removed as "report_vendor_receipt_document"(pick_pack_ship/report/delivery_receipt_temp.xml) report from pick_pack_ship module is not used (Reference: yuhelia_base/models/stock.py:90)
+- **vendor_product_name**: Related vendor product name - can be removed as "report_vendor_receipt_document"(pick_pack_ship/report/delivery_receipt_temp.xml) report from pick_pack_ship module is not used (Reference: yuhelia_base/models/stock.py:91)
 - **pro_image**: Related product image
+
+![Picking Line – Product Image](../screenshots/yuehlia_base_picking_line_image.png)
 
 ### 8. View Customizations
 
@@ -99,10 +152,32 @@ The Yuehlia Base module serves as the core foundation module for Yuehlia brand c
 - **Tree view**: Added product code and name columns
 - **Purchase tab**: Restricted access to specific user groups
 
+![Product Search – Vendor Code & Name](../screenshots/yuehlia_base_product_product_code_name_search.png)
+
+Note: Vendor product code and name are included in the search to help the purchasing department find products faster.
+
 #### 8.2 Purchase Views
 - **Order line enhancements**: Added total quantity and product brand columns
 - **PO type field**: Added purchase order type selection
 - **Report customization**: Added barcode to purchase order reports
+
+![Purchase Form – Brand](../screenshots/yuehlia_base_purchase_form_brand.png)
+
+Note: Brand value is added to the Purchase form.
+
+![Purchase Total Qty](../screenshots/yuehlia_base_purchase_total_qty.png)
+
+Note: The total qty field was created because of the bonus qty (FOC) customization from the `purchase_bonus_qty` module.
+
+![Purchase PO Type](../screenshots/yuehlia_base_purchase_po_type.png)
+
+Note: This is a simple drop-down to indicate which pricing type the PO is using; no further logic depends on it.
+
+![Purchase Order Print](../screenshots/yuehlia_base_po_print.png)
+
+![Purchase Order Print with Bonus Qty](../screenshots/yuehlia_base_po_print_with_bonus_qty.png)
+
+Note: The print layout differs when a PO contains bonus qty values.
 
 #### 8.3 Stock Views
 - **Product image**: Added product image widget in picking operations
@@ -118,7 +193,7 @@ The Yuehlia Base module serves as the core foundation module for Yuehlia brand c
 
 #### 9.1 User Groups
 - **group_contacts_show**: Controls visibility of contacts menu
-- **group_product_template_show1**: Controls access to product purchase tab
+- **group_product_template_show**: Controls access to product purchase tab
 
 ### 10. Data and Sequences
 
